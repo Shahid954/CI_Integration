@@ -167,18 +167,18 @@ public class AppLibrary {
 			if (config.getBrowserName().equalsIgnoreCase("GCH") || config.getBrowserName().equalsIgnoreCase("chrome")) {
 				WebDriverManager.chromedriver().setup();
 				ChromeOptions options = new ChromeOptions();
-				options.addArguments("--test-type");
-				options.addArguments("--disable-extensions");
-				options.addArguments("--start-maximized");
-				options.addArguments("--remote-allow-origins=*");
+//				options.addArguments("--test-type");
+//				options.addArguments("--disable-extensions");
+//				options.addArguments("--start-maximized");
+//				options.addArguments("--remote-allow-origins=*");
 
-				// options.addArguments("--headless");
-				// options.addArguments("--verbose");
-				// options.addArguments("--no-sandbox");
-				// options.addArguments("--test-type");
-				// options.addArguments("--disable-extensions");
-				// options.addArguments("--start-maximized");
-				// options.addArguments("--remote-allow-origins=*");
+				options.addArguments("--headless");
+				options.addArguments("--verbose");
+				 options.addArguments("--no-sandbox");
+				 options.addArguments("--test-type");
+				 options.addArguments("--disable-extensions");
+				 options.addArguments("--start-maximized");
+				 options.addArguments("--remote-allow-origins=*");
 
 				driver = new ChromeDriver(options);
 			} else if (config.getBrowserName().equalsIgnoreCase("firefox")) {
