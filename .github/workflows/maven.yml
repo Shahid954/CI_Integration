@@ -75,6 +75,23 @@ jobs:
         -d "{\"text\": \"✅ Test Execution Completed\n📄 Status: $STATUS\n📎 [View Report]($REPORT_URL)\n👤 Author: ${{ github.actor }}\n🔁 Run ID: #${{ github.run_number }}\"}" \
         "${{ secrets.GOOGLE_CHAT_WEBHOOK }}"
 
+    - name: Extract TestNG Results
+      id: testng
+      if: always()
+      run: |
+        FILE="target/surefire-reports/testng-results.xml"
+        total=$(xmllint --xpath "string(/testng-results/@total)" "$FILE")
+        passed=$(xmllint --xpath "string(/testng-results/@passed)" "$FILE")
+        failed=$(xmllint --xpath "string(/testng-results/@failed)" "$FILE")
+        skipped=$(xmllint --xpath "string(/testng-results/@skipped)" "$FILE")
+
+        echo "total=$total" >> $GITHUB_OUTPUT
+        echo "passed=$passed" >> $GITHUB_OUTPUT
+        echo "failed=$failed" >> $GITHUB_OUTPUT
+        echo "skipped=$skipped" >> $GITHUB_OUTPUT
+
+
+
     - name: Send Email Report
       if: always()
       uses: dawidd6/action-send-mail@v3
@@ -91,6 +108,13 @@ jobs:
           Hello Team,
 
           Test Execution has been completed for Run #${{ github.run_number }}.
+
+          **Execution Summary**
+          Total Tests: ${{ steps.results.outputs.total }}
+          Passed: ${{ steps.results.outputs.passed }}
+          Failed: ${{ steps.results.outputs.failed }}
+          Skipped: ${{ steps.results.outputs.skipped }}
+          
           I've attached the TestNG HTML Report.
 
           Regards,
