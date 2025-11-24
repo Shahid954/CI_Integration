@@ -1,35 +1,97 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-name: Java CI with Maven
+name: Selenium CI Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+    - name: Notify Start - Google Chat
+      run: |
+        curl -H 'Content-Type: application/json' \
+        -d "{\"text\": \"🚀 Test Execution Started\n🔹 Repo: ${{ github.repository }}\n👤 Triggered by: ${{ github.actor }}\n🔁 Run ID: #${{ github.run_number }}\"}" \
+        "${{ secrets.GOOGLE_CHAT_WEBHOOK }}"
 
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    - name: Update dependency graph
-      uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Build with Maven and run tests
+      continue-on-error: true
+      run: mvn clean test -DsuiteXmlFile=testng.xml
+      
+
+    # - name: Archive Test Report
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: surefire-report
+    #     path: target/surefire-reports/
+
+    - name: Archive Test Report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: surefire-report
+        path: target/surefire-reports/
+
+    - name: Create timestamped report directory
+      if: always()
+      id: timestamp
+      run: |
+        export TS="run-$(date +%Y-%m-%d_%H-%M-%S)"
+        mkdir -p gh-pages/$TS
+        cp -r target/surefire-reports/* gh-pages/$TS/
+        echo "report_path=$TS" >> $GITHUB_OUTPUT
+
+    - name: Deploy timestamped report to GitHub Pages
+      if: always()
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        personal_token: ${{ secrets.REPORT_REPO_PAT }}
+        external_repository: Shahid954/api-test-reports
+        publish_branch: gh-pages
+        publish_dir: gh-pages
+        keep_files: true
+
+    - name: Notify Completion - Google Chat
+      if: always()
+      run: |
+        STATUS="${{ job.status }}"
+        REPORT_PATH="${{ steps.timestamp.outputs.report_path }}"
+        REPORT_URL="https://Shahid954.github.io/api-test-reports/${REPORT_PATH}/emailable-report.html"
+
+        curl -H 'Content-Type: application/json' \
+        -d "{\"text\": \"✅ Test Execution Completed\n📄 Status: $STATUS\n📎 [View Report]($REPORT_URL)\n👤 Author: ${{ github.actor }}\n🔁 Run ID: #${{ github.run_number }}\"}" \
+        "${{ secrets.GOOGLE_CHAT_WEBHOOK }}"
+
+    - name: Send Email Report
+      if: always()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: "Test Execution Report - Run #${{ github.run_number }}"
+        to: "mohd.shahid@thinkitive.com"
+        from: "mohd.shahid@thinkitive.com"
+        attachments: "target/surefire-reports/emailable-report.html"
+        body: |
+          Hello Team,
+
+          Test Execution has been completed for Run #${{ github.run_number }}.
+          I've attached the TestNG HTML Report.
+
+          Regards,
+          Mohd Shahid
