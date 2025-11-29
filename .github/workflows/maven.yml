@@ -12,32 +12,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+    # ---------------- START NOTIFICATION ----------------
     - name: Notify Start - Google Chat
       run: |
         curl -H 'Content-Type: application/json' \
-        -d "{\"text\": \"🚀 Test Execution Started\n🔹 Repo: ${{ github.repository }}\n👤 Triggered by: ${{ github.actor }}\n🔁 Run ID: #${{ github.run_number }}\"}" \
+        -d "{\"text\": \"🚀 *Test Execution Started*\n🔹 *Repo:* ${{ github.repository }}\n👤 *Triggered by:* ${{ github.actor }}\n🔁 *Run ID:* #${{ github.run_number }}\"}" \
         "${{ secrets.GOOGLE_CHAT_WEBHOOK }}"
 
+    # ---------------- CHECKOUT ----------------
     - name: Checkout repo
       uses: actions/checkout@v3
 
+    # ---------------- JAVA SETUP ----------------
     - name: Set up Java
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: '17'
 
+    # ---------------- RUN TESTS ----------------
     - name: Build with Maven and run tests
       continue-on-error: true
       run: mvn clean test -DsuiteXmlFile=testng.xml
-      
 
-    # - name: Archive Test Report
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: surefire-report
-    #     path: target/surefire-reports/
+    # ---------------- PARSE TESTNG RESULTS ----------------
+    - name: Parse TestNG Results
+      id: testng
+      run: |
+        TOTAL=$(grep -oP 'tests="\K\d+' target/surefire-reports/testng-results.xml)
+        PASSED=$(grep -oP 'passed="\K\d+' target/surefire-reports/testng-results.xml)
+        FAILED=$(grep -oP 'failed="\K\d+' target/surefire-reports/testng-results.xml)
+        SKIPPED=$(grep -oP 'skipped="\K\d+' target/surefire-reports/testng-results.xml)
 
+        echo "total=$TOTAL" >> $GITHUB_OUTPUT
+        echo "passed=$PASSED" >> $GITHUB_OUTPUT
+        echo "failed=$FAILED" >> $GITHUB_OUTPUT
+        echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
+
+    # ---------------- ARCHIVE REPORT ----------------
     - name: Archive Test Report
       if: always()
       uses: actions/upload-artifact@v4
@@ -45,6 +58,7 @@ jobs:
         name: surefire-report
         path: target/surefire-reports/
 
+    # ---------------- CREATE TIMESTAMP FOLDER ----------------
     - name: Create timestamped report directory
       if: always()
       id: timestamp
@@ -54,16 +68,15 @@ jobs:
         cp -r target/surefire-reports/* gh-pages/$TS/
         echo "report_path=$TS" >> $GITHUB_OUTPUT
 
+    # ---------------- DEPLOY REPORT TO GITHUB PAGES ----------------
     - name: Deploy timestamped report to GitHub Pages
       if: always()
       uses: peaceiris/actions-gh-pages@v3
       with:
         personal_token: ${{ secrets.REPORT_REPO_PAT }}
-        external_repository: Shahid954/api-test-reports
-        publish_branch: gh-pages
         publish_dir: gh-pages
-        keep_files: true
 
+    # ---------------- SEND GOOGLE CHAT COMPLETION ----------------
     - name: Notify Completion - Google Chat
       if: always()
       run: |
@@ -72,9 +85,10 @@ jobs:
         REPORT_URL="https://Shahid954.github.io/api-test-reports/${REPORT_PATH}/emailable-report.html"
 
         curl -H 'Content-Type: application/json' \
-        -d "{\"text\": \"✅ Test Execution Completed\n📄 Status: $STATUS\n📎 [View Report]($REPORT_URL)\n👤 Author: ${{ github.actor }}\n🔁 Run ID: #${{ github.run_number }}\"}" \
+        -d "{\"text\": \"✅ *Test Execution Completed*\n📄 *Status:* $STATUS\n\n📊 *Test Summary*\n• Total Tests: ${{ steps.testng.outputs.total }}\n• Passed: ${{ steps.testng.outputs.passed }}\n• Failed: ${{ steps.testng.outputs.failed }}\n• Skipped: ${{ steps.testng.outputs.skipped }}\n\n📎 *Report:* $REPORT_URL\n👤 Triggered by: ${{ github.actor }}\n🔁 Run ID: #${{ github.run_number }}\"}" \
         "${{ secrets.GOOGLE_CHAT_WEBHOOK }}"
 
+    # ---------------- SEND EMAIL ----------------
     - name: Send Email Report
       if: always()
       uses: dawidd6/action-send-mail@v3
@@ -90,8 +104,16 @@ jobs:
         body: |
           Hello Team,
 
-          Test Execution has been completed for Run #${{ github.run_number }}.
-          I've attached the TestNG HTML Report.
+          The Selenium automation execution has been completed.
+
+          📊 Test Summary:
+          • Total: ${{ steps.testng.outputs.total }}
+          • Passed: ${{ steps.testng.outputs.passed }}
+          • Failed: ${{ steps.testng.outputs.failed }}
+          • Skipped: ${{ steps.testng.outputs.skipped }}
+
+          🔗 Report:
+          https://Shahid954.github.io/api-test-reports/${{ steps.timestamp.outputs.report_path }}/emailable-report.html
 
           Regards,
-          Mohd Shahid
+          Shahid
