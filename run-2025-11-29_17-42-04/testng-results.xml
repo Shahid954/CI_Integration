@@ -56,16 +56,16 @@
       <![CDATA[Closing the Browser Successfully]]>
     </line>
   </reporter-output>
-  <suite started-at="2025-11-29T17:38:32 UTC" name="Suite" finished-at="2025-11-29T17:38:42 UTC" duration-ms="10534">
+  <suite started-at="2025-11-29T17:41:53 UTC" name="Suite" finished-at="2025-11-29T17:42:03 UTC" duration-ms="9680">
     <groups>
     </groups>
-    <test started-at="2025-11-29T17:38:32 UTC" name="Test" finished-at="2025-11-29T17:38:42 UTC" duration-ms="10534">
+    <test started-at="2025-11-29T17:41:53 UTC" name="Test" finished-at="2025-11-29T17:42:03 UTC" duration-ms="9680">
       <class name="test.Test_Login">
-        <test-method is-config="true" signature="cleanUp()[pri:0, instance:test.Test_Login@618b19ad]" started-at="2025-11-29T17:38:32 UTC" name="cleanUp" finished-at="2025-11-29T17:38:32 UTC" duration-ms="4" status="PASS">
+        <test-method is-config="true" signature="cleanUp()[pri:0, instance:test.Test_Login@618b19ad]" started-at="2025-11-29T17:41:53 UTC" name="cleanUp" finished-at="2025-11-29T17:41:53 UTC" duration-ms="4" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- cleanUp -->
-        <test-method is-config="true" signature="setUp(org.testng.ITestContext)[pri:0, instance:test.Test_Login@618b19ad]" started-at="2025-11-29T17:38:32 UTC" name="setUp" finished-at="2025-11-29T17:38:32 UTC" duration-ms="34" status="PASS">
+        <test-method is-config="true" signature="setUp(org.testng.ITestContext)[pri:0, instance:test.Test_Login@618b19ad]" started-at="2025-11-29T17:41:53 UTC" name="setUp" finished-at="2025-11-29T17:41:54 UTC" duration-ms="37" status="PASS">
           <params>
             <param index="0">
               <value>
@@ -76,7 +76,7 @@
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUp -->
-        <test-method is-config="true" signature="setup()[pri:0, instance:test.Test_Login@618b19ad]" started-at="2025-11-29T17:38:32 UTC" name="setup" finished-at="2025-11-29T17:38:32 UTC" duration-ms="5" status="PASS">
+        <test-method is-config="true" signature="setup()[pri:0, instance:test.Test_Login@618b19ad]" started-at="2025-11-29T17:41:54 UTC" name="setup" finished-at="2025-11-29T17:41:54 UTC" duration-ms="5" status="PASS">
           <reporter-output>
             <line>
               <![CDATA[urlSolo:https://uat.dev.mitratech.com/TCE_WEBLB_OLR_02/login ]]>
@@ -113,7 +113,7 @@
             </line>
           </reporter-output>
         </test-method> <!-- setup -->
-        <test-method signature="teamConnectLogin()[pri:0, instance:test.Test_Login@618b19ad]" started-at="2025-11-29T17:38:32 UTC" name="teamConnectLogin" finished-at="2025-11-29T17:38:42 UTC" duration-ms="10358" status="PASS">
+        <test-method signature="teamConnectLogin()[pri:0, instance:test.Test_Login@618b19ad]" started-at="2025-11-29T17:41:54 UTC" name="teamConnectLogin" finished-at="2025-11-29T17:42:03 UTC" duration-ms="9496" status="PASS">
           <reporter-output>
             <line>
               <![CDATA[Finding element using: xpath:-://input[@id='username']]]>
@@ -135,7 +135,7 @@
             </line>
           </reporter-output>
         </test-method> <!-- teamConnectLogin -->
-        <test-method is-config="true" signature="checkAlerts(org.testng.ITestResult)[pri:0, instance:test.Test_Login@618b19ad]" started-at="2025-11-29T17:38:42 UTC" name="checkAlerts" finished-at="2025-11-29T17:38:42 UTC" duration-ms="120" status="PASS">
+        <test-method is-config="true" signature="checkAlerts(org.testng.ITestResult)[pri:0, instance:test.Test_Login@618b19ad]" started-at="2025-11-29T17:42:03 UTC" name="checkAlerts" finished-at="2025-11-29T17:42:03 UTC" duration-ms="126" status="PASS">
           <params>
             <param index="0">
               <value>
@@ -146,7 +146,7 @@
           <reporter-output>
           </reporter-output>
         </test-method> <!-- checkAlerts -->
-        <test-method is-config="true" signature="quitBrowser()[pri:0, instance:test.Test_Login@618b19ad]" started-at="2025-11-29T17:38:42 UTC" name="quitBrowser" finished-at="2025-11-29T17:38:42 UTC" duration-ms="1" status="PASS">
+        <test-method is-config="true" signature="quitBrowser()[pri:0, instance:test.Test_Login@618b19ad]" started-at="2025-11-29T17:42:03 UTC" name="quitBrowser" finished-at="2025-11-29T17:42:03 UTC" duration-ms="1" status="PASS">
           <reporter-output>
             <line>
               <![CDATA[Closing the Browser Successfully]]>
