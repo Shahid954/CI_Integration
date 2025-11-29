@@ -115,7 +115,7 @@ jobs:
           • Skipped: ${{ steps.testng.outputs.skipped }}
 
           🔗 Detailed Report:
-          https://Shahid954.github.io/api-test-reports/${{ steps.timestamp.outputs.report_path }}/emailable-report.html
+          https://github.com/Shahid954/CI_Integration/api-test-reports/${{ steps.timestamp.outputs.report_path }}/emailable-report.html
 
           Regards,
           Shahid
