@@ -110,10 +110,10 @@ jobs:
           Test Execution has been completed for Run #${{ github.run_number }}.
 
           **Execution Summary**
-          Total Tests: ${{ steps.results.outputs.total }}
-          Passed: ${{ steps.results.outputs.passed }}
-          Failed: ${{ steps.results.outputs.failed }}
-          Skipped: ${{ steps.results.outputs.skipped }}
+          Total Tests: ${{ steps.testng.outputs.total }}
+          Passed: ${{ steps.testng.outputs.passed }}
+          Failed: ${{ steps.testng.outputs.failed }}
+          Skipped: ${{ steps.testng.outputs.skipped }}
           
           I've attached the TestNG HTML Report.
 
