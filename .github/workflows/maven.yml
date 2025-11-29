@@ -84,7 +84,7 @@ jobs:
       run: |
         STATUS="${{ job.status }}"
         REPORT_PATH="${{ steps.timestamp.outputs.report_path }}"
-        REPORT_URL="https://shahid954.github.io/api-test-reports/${REPORT_PATH}/emailable-report.html"
+        REPORT_URL="https://Shahid954.github.io/api-test-reports/${REPORT_PATH}/emailable-report.html"
 
         curl -H 'Content-Type: application/json' \
         -d "{\"text\": \"✅ *Test Execution Completed*\n📄 *Status:* $STATUS\n\n📊 *Test Summary*\n• Total Tests: ${{ steps.testng.outputs.total }}\n• Passed: ${{ steps.testng.outputs.passed }}\n• Failed: ${{ steps.testng.outputs.failed }}\n• Skipped: ${{ steps.testng.outputs.skipped }}\n\n📎 *Report:* $REPORT_URL\n👤 Triggered by: ${{ github.actor }}\n🔁 Run ID: #${{ github.run_number }}\"}" \
@@ -115,7 +115,7 @@ jobs:
           • Skipped: ${{ steps.testng.outputs.skipped }}
 
           🔗 Detailed Report:
-          https://shahid954.github.io/api-test-reports/${{ steps.timestamp.outputs.report_path }}/emailable-report.html
+          https://Shahid954.github.io/api-test-reports/${{ steps.timestamp.outputs.report_path }}/emailable-report.html
 
           Regards,
           Shahid
