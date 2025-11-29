@@ -1,3 +1,4 @@
+
 name: Selenium CI Pipeline
 
 on:
@@ -30,13 +31,6 @@ jobs:
     - name: Build with Maven and run tests
       continue-on-error: true
       run: mvn clean test -DsuiteXmlFile=testng.xml
-      
-
-    # - name: Archive Test Report
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: surefire-report
-    #     path: target/surefire-reports/
 
     - name: Archive Test Report
       if: always()
@@ -64,33 +58,42 @@ jobs:
         publish_dir: gh-pages
         keep_files: true
 
-    - name: Notify Completion - Google Chat
-      if: always()
-      run: |
-        STATUS="${{ job.status }}"
-        REPORT_PATH="${{ steps.timestamp.outputs.report_path }}"
-        REPORT_URL="https://Shahid954.github.io/api-test-reports/${REPORT_PATH}/emailable-report.html"
-
-        curl -H 'Content-Type: application/json' \
-        -d "{\"text\": \"✅ Test Execution Completed\n📄 Status: $STATUS\n📎 [View Report]($REPORT_URL)\n👤 Author: ${{ github.actor }}\n🔁 Run ID: #${{ github.run_number }}\"}" \
-        "${{ secrets.GOOGLE_CHAT_WEBHOOK }}"
-
     - name: Extract TestNG Results
       id: testng
       if: always()
       run: |
         FILE="target/surefire-reports/testng-results.xml"
-        total=$(xmllint --xpath "string(/testng-results/@total)" "$FILE")
-        passed=$(xmllint --xpath "string(/testng-results/@passed)" "$FILE")
-        failed=$(xmllint --xpath "string(/testng-results/@failed)" "$FILE")
-        skipped=$(xmllint --xpath "string(/testng-results/@skipped)" "$FILE")
+        if [ -f "$FILE" ]; then
+          total=$(xmllint --xpath "string(/testng-results/@total)" "$FILE")
+          passed=$(xmllint --xpath "string(/testng-results/@passed)" "$FILE")
+          failed=$(xmllint --xpath "string(/testng-results/@failed)" "$FILE")
+          skipped=$(xmllint --xpath "string(/testng-results/@skipped)" "$FILE")
+        else
+          total="N/A"
+          passed="N/A"
+          failed="N/A"
+          skipped="N/A"
+        fi
 
         echo "total=$total" >> $GITHUB_OUTPUT
         echo "passed=$passed" >> $GITHUB_OUTPUT
         echo "failed=$failed" >> $GITHUB_OUTPUT
         echo "skipped=$skipped" >> $GITHUB_OUTPUT
 
+    - name: Notify Completion - Google Chat
+      if: always()
+      run: |
+        STATUS="${{ job.status }}"
+        REPORT_PATH="${{ steps.timestamp.outputs.report_path }}"
+        REPORT_URL="https://Shahid954.github.io/api-test-reports/${REPORT_PATH}/emailable-report.html"
+        TOTAL="${{ steps.testng.outputs.total }}"
+        PASSED="${{ steps.testng.outputs.passed }}"
+        FAILED="${{ steps.testng.outputs.failed }}"
+        SKIPPED="${{ steps.testng.outputs.skipped }}"
 
+        curl -H 'Content-Type: application/json' \
+        -d "{\"text\": \"✅ Test Execution Completed\n📄 Status: $STATUS\n🔢 Summary:\nTotal: $TOTAL\nPassed: $PASSED\nFailed: $FAILED\nSkipped: $SKIPPED\n📎 [View Report]($ Author: ${{ github.actor }}\n🔁 Run ID: #${{ github.run_number }}\"}" \
+        "${{ secrets.GOOGLE_CHAT_WEBHOOK }}"
 
     - name: Send Email Report
       if: always()
@@ -114,7 +117,7 @@ jobs:
           Passed: ${{ steps.testng.outputs.passed }}
           Failed: ${{ steps.testng.outputs.failed }}
           Skipped: ${{ steps.testng.outputs.skipped }}
-          
+
           I've attached the TestNG HTML Report.
 
           Regards,
